@@ -1,0 +1,31 @@
+/* Planora 랜딩페이지 — 전역 리셋 & 폰트 & 인라인으로 처리 못하는 상태(:hover) */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+* { box-sizing: border-box; }
+/* html { scroll-behavior: smooth; }
+body { margin: 0; padding: 0; } */
+
+html, body, #root, #app { 
+  margin: 0; 
+  padding: 0; 
+  width: 100%;
+  min-height: 100vh; 
+  scroll-behavior: smooth;
+}
+
+::selection { background: #16181d; color: #fff; }
+
+/* hover 상태는 인라인 스타일로 표현할 수 없어 여기서 처리 */
+.pl-navlink { transition: color 0.15s ease; }
+.pl-navlink:hover { color: #16181d; }
+
+.title1 {
+    color: #000000;
+}
+
+.pl-feature { transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.pl-feature:hover { border-color: #d3d8e0; box-shadow: 0 8px 24px -16px rgba(22,24,29,0.18); }
+
+.pl-footer-link { transition: color 0.15s ease; }
+.pl-footer-link:hover { color: #33383f; }

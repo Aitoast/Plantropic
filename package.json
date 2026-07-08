@@ -1,0 +1,1 @@
+{ "private": true, "workspaces": ["core", "mobile", "server", "web"] }

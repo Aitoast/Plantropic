@@ -1,0 +1,143 @@
+/* LoginPage.css — Planora 웹 로그인/회원가입 스타일
+   폰트: IBM Plex Sans / Mono (index.html에서 로드) */
+
+.pl-page {
+  min-height: 100vh;
+  display: flex;
+  gap: 28px;
+  padding: 28px;
+  background: #eceef2;
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  color: #1a1d21;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+.pl-page *, .pl-page *::before, .pl-page *::after { box-sizing: border-box; }
+
+/* ---- LEFT BRAND ---- */
+.pl-brand {
+  flex: 1 1 46%;
+  min-width: 0;
+  background: #16181d;
+  border-radius: 24px;
+  padding: 48px clamp(36px, 4vw, 60px);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.pl-brand-glow {
+  position: absolute; top: -120px; right: -120px;
+  width: 380px; height: 380px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(123,138,224,0.22), transparent 70%);
+}
+.pl-logo { display: flex; align-items: center; gap: 12px; position: relative; text-decoration: none; }
+.pl-logo-mark {
+  width: 36px; height: 36px; border-radius: 10px; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  color: #16181d; font-weight: 700; font-size: 18px;
+}
+.pl-logo-word { font-size: 21px; font-weight: 600; letter-spacing: -0.4px; color: #fff; }
+
+.pl-brand-body { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; padding: 40px 0; }
+.pl-badge {
+  display: inline-flex; align-self: flex-start; align-items: center; gap: 8px;
+  padding: 6px 13px; background: rgba(255,255,255,0.08); border-radius: 20px;
+  font-size: 12.5px; font-weight: 600; color: #c8cdd6; margin-bottom: 26px;
+}
+.pl-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #7fe0a8; }
+.pl-brand-title { font-size: clamp(28px, 3.4vw, 42px); font-weight: 700; letter-spacing: -1.2px; line-height: 1.12; margin: 0; color: #fff; text-wrap: balance; }
+.pl-brand-sub { font-size: 15.5px; line-height: 1.65; color: #a3aab6; margin: 20px 0 0; max-width: 380px; }
+
+.pl-mock {
+  margin-top: 38px; max-width: 380px; background: #1e2129;
+  border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 16px;
+  box-shadow: 0 24px 50px -24px rgba(0,0,0,0.6);
+  animation: pl-float 0.6s cubic-bezier(0.22,0.61,0.36,1) both;
+}
+@keyframes pl-float { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+.pl-mock-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.pl-mock-date { font-size: 13px; font-weight: 600; color: #e4e7ec; }
+.pl-mock-count { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: #6b7280; }
+.pl-mock-row { display: flex; align-items: center; gap: 11px; margin-top: 8px; }
+.pl-mock-time { font-family: "IBM Plex Mono", monospace; font-size: 11.5px; color: #7c828d; width: 42px; flex-shrink: 0; }
+.pl-mock-bar { width: 3px; height: 20px; border-radius: 2px; flex-shrink: 0; }
+.pl-mock-title { font-size: 13px; color: #cfd3da; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-brand-foot { position: relative; font-size: 12.5px; color: #6b7280; }
+
+/* ---- RIGHT FORM ---- */
+.pl-form-panel {
+  flex: 1 1 54%; min-width: 0; background: #fff; border-radius: 24px;
+  border: 1px solid #e6e9ef; display: flex; align-items: center; justify-content: center;
+  padding: 48px 28px;
+}
+.pl-form-wrap { width: 100%; max-width: 400px; }
+
+.pl-tabs { display: flex; height: 44px; background: #f0f1f4; border-radius: 12px; padding: 4px; margin-bottom: 32px; }
+.pl-tab {
+  flex: 1; border: none; border-radius: 9px; font-family: inherit; font-size: 14.5px;
+  font-weight: 500; cursor: pointer; background: transparent; color: #8a919c; transition: all 0.15s;
+}
+.pl-tab.on { background: #fff; color: #16181d; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+.pl-heading { font-size: 27px; font-weight: 700; letter-spacing: -0.8px; margin: 0; }
+.pl-subheading { font-size: 14.5px; color: #6b7280; margin: 9px 0 0; line-height: 1.55; }
+
+.pl-social { display: flex; flex-direction: column; gap: 10px; margin-top: 28px; }
+.pl-social-btn {
+  display: flex; align-items: center; justify-content: center; gap: 11px; height: 50px;
+  border: 1px solid #dce0e7; background: #fff; border-radius: 13px; font-family: inherit;
+  font-size: 14.5px; font-weight: 600; color: #33383f; cursor: pointer; transition: all 0.15s;
+}
+.pl-social-btn:hover { border-color: #c3c9d2; background: #fafbfc; }
+.pl-social-btn.pl-kakao { border: none; background: #FEE500; color: #191600; }
+.pl-social-btn.pl-kakao:hover { filter: brightness(0.96); background: #FEE500; }
+
+.pl-divider { display: flex; align-items: center; gap: 14px; margin: 24px 0; }
+.pl-divider::before, .pl-divider::after { content: ""; flex: 1; height: 1px; background: #e6e9ef; }
+.pl-divider span { font-size: 12px; color: #a0a6b0; font-weight: 500; }
+
+.pl-fields { display: flex; flex-direction: column; gap: 15px; }
+.pl-field { display: flex; flex-direction: column; gap: 7px; }
+.pl-field-head { display: flex; align-items: baseline; justify-content: space-between; }
+.pl-label { font-size: 12.5px; font-weight: 600; color: #8a919c; letter-spacing: 0.2px; }
+.pl-input {
+  height: 50px; padding: 0 15px; border: 1px solid #d6dae2; border-radius: 13px;
+  font-family: inherit; font-size: 15px; color: #1a1d21; background: #fff; outline: none; transition: all 0.15s;
+}
+.pl-input::placeholder { color: #b3b9c2; }
+.pl-input:focus { border-color: #16181d; box-shadow: 0 0 0 3px rgba(22,24,29,0.08); }
+
+.pl-check-row { display: flex; align-items: flex-start; gap: 9px; cursor: pointer; margin-top: 2px; }
+.pl-check {
+  width: 20px; height: 20px; flex-shrink: 0; border-radius: 6px; border: 1.5px solid #c3c9d2;
+  background: #fff; color: #fff; font-size: 12px; line-height: 1; display: flex; align-items: center;
+  justify-content: center; cursor: pointer; padding: 0; margin-top: 1px;
+}
+.pl-check.on { border-color: #16181d; background: #16181d; }
+.pl-check-row span { font-size: 13px; color: #6b7280; line-height: 1.5; }
+
+.pl-error {
+  font-size: 13px; color: #b4552f; background: #fbeee7; border-radius: 10px;
+  padding: 10px 13px; line-height: 1.45;
+}
+
+.pl-cta {
+  width: 100%; height: 52px; margin-top: 7px; border: none; background: #16181d; color: #fff;
+  border-radius: 14px; font-family: inherit; font-size: 15.5px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(22,24,29,0.22); transition: background 0.15s;
+}
+.pl-cta:hover { background: #000; }
+.pl-cta:disabled { opacity: 0.6; cursor: default; }
+
+.pl-switch { text-align: center; font-size: 13.5px; color: #8a919c; margin: 22px 0 0; }
+.pl-link { color: #3b6fd4; text-decoration: none; font-weight: 500; }
+.pl-link:hover { color: #2a56ad; }
+.pl-switch .pl-link { font-weight: 600; }
+
+/* 반응형: 좁은 화면에서 브랜드 패널 숨김 */
+@media (max-width: 860px) {
+  .pl-brand { display: none; }
+  .pl-page { padding: 0; }
+  .pl-form-panel { border-radius: 0; border: none; }
+}

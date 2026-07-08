@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'IBM Plex Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #1a1d21; }
+  a { color: #3b6fd4; text-decoration: none; }
+  a:hover { color: #2a56ad; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #d3d8e0; border-radius: 8px; border: 3px solid transparent; background-clip: padding-box; }
+  ::-webkit-scrollbar-thumb:hover { background: #b6bdc9; background-clip: padding-box; border: 3px solid transparent; }
+  @keyframes panelIn { from { transform: translateX(16px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+</style>
+</helmet>
+<div style="height: 100vh; display: flex; flex-direction: column; background: #f5f6f8; overflow: hidden;">
+
+  <header style="height: 60px; flex-shrink: 0; background: #ffffff; border-bottom: 1px solid #e6e9ef; display: flex; align-items: center; padding: 0 20px; gap: 20px; z-index: 20;">
+    <div style="display: flex; align-items: center; gap: 12px; width: 232px; flex-shrink: 0;">
+      <div style="width: 30px; height: 30px; border-radius: 8px; background: #16181d; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 15px; letter-spacing: -0.5px;">P</div>
+      <span style="font-size: 19px; font-weight: 600; letter-spacing: -0.4px;">Planora</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button onClick="{{ goToday }}" style="height: 36px; padding: 0 16px; border: 1px solid #d6dae2; background: #fff; border-radius: 8px; font-family: inherit; font-size: 13.5px; font-weight: 500; color: #33383f; cursor: pointer; white-space: nowrap;">오늘</button>
+      <div style="display: flex; align-items: center; gap: 2px;">
+        <button onClick="{{ prevPeriod }}" style="width: 34px; height: 34px; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: #6b7280; font-size: 18px; display: flex; align-items: center; justify-content: center;">‹</button>
+        <button onClick="{{ nextPeriod }}" style="width: 34px; height: 34px; border: none; background: transparent; border-radius: 8px; cursor: pointer; color: #6b7280; font-size: 18px; display: flex; align-items: center; justify-content: center;">›</button>
+      </div>
+      <h1 style="font-size: 20px; font-weight: 600; letter-spacing: -0.5px; margin: 0 0 0 8px; min-width: 150px;">{{ periodLabel }}</h1>
+    </div>
+    <div style="flex: 1;"></div>
+    <div style="display: flex; align-items: center; height: 36px; background: #f0f1f4; border-radius: 9px; padding: 3px; flex-shrink: 0; white-space: nowrap;">
+      <sc-for list="{{ viewTabs }}" as="tab" hint-placeholder-count="4">
+        <button onClick="{{ tab.onClick }}" style="{{ tab.style }}">{{ tab.label }}</button>
+      </sc-for>
+    </div>
+    <div style="width: 200px; min-width: 120px; height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 12px; background: #f0f1f4; border-radius: 9px; color: #9aa1ac; flex-shrink: 1; overflow: hidden;">
+      <span style="font-size: 15px;">⌕</span>
+      <span style="font-size: 13.5px;">일정 검색</span>
+    </div>
+    <div style="width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6b7280; cursor: pointer; position: relative;">
+      <span style="font-size: 17px;">◔</span>
+      <span style="position: absolute; top: 5px; right: 6px; width: 7px; height: 7px; border-radius: 50%; background: #d97757; border: 1.5px solid #fff;"></span>
+    </div>
+    <div style="width: 34px; height: 34px; border-radius: 50%; background: #16181d; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600;">유</div>
+  </header>
+
+  <div style="flex: 1; display: flex; min-height: 0;">
+
+    <!-- SIDEBAR -->
+    <aside style="width: 252px; flex-shrink: 0; background: #ffffff; border-right: 1px solid #e6e9ef; padding: 18px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 22px;">
+      <button onClick="{{ openCreate }}" style="height: 46px; border: none; background: #16181d; color: #fff; border-radius: 11px; font-family: inherit; font-size: 14.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.15);">
+        <span style="font-size: 18px; font-weight: 400; line-height: 1;">＋</span> 일정 만들기
+      </button>
+
+      <!-- MINI CALENDAR -->
+      <div>
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 4px 10px;">
+          <span style="font-size: 13.5px; font-weight: 600;">{{ periodLabel }}</span>
+          <div style="display: flex; gap: 2px;">
+            <button onClick="{{ prevPeriod }}" style="width: 24px; height: 24px; border: none; background: transparent; cursor: pointer; color: #9aa1ac; font-size: 14px;">‹</button>
+            <button onClick="{{ nextPeriod }}" style="width: 24px; height: 24px; border: none; background: transparent; cursor: pointer; color: #9aa1ac; font-size: 14px;">›</button>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;">
+          <sc-for list="{{ miniHeaders }}" as="h" hint-placeholder-count="7">
+            <div style="text-align: center; font-size: 10.5px; color: #a0a6b0; font-weight: 500; padding-bottom: 4px;">{{ h }}</div>
+          </sc-for>
+          <sc-for list="{{ miniDays }}" as="d" hint-placeholder-count="42">
+            <button onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.num }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- MY CALENDARS -->
+      <div>
+        <div style="font-size: 11.5px; font-weight: 600; color: #8a919c; letter-spacing: 0.4px; text-transform: uppercase; padding: 0 4px 10px;">내 캘린더</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <sc-for list="{{ myCalendars }}" as="c" hint-placeholder-count="4">
+            <button onClick="{{ c.onToggle }}" style="display: flex; align-items: center; gap: 11px; padding: 8px 10px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-family: inherit; text-align: left; width: 100%;">
+              <span style="{{ c.boxStyle }}">{{ c.check }}</span>
+              <span style="{{ c.labelStyle }}">{{ c.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- SHARED -->
+      <div>
+        <div style="font-size: 11.5px; font-weight: 600; color: #8a919c; letter-spacing: 0.4px; text-transform: uppercase; padding: 0 4px 10px;">공유 캘린더</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <sc-for list="{{ sharedCalendars }}" as="c" hint-placeholder-count="2">
+            <button onClick="{{ c.onToggle }}" style="display: flex; align-items: center; gap: 11px; padding: 8px 10px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-family: inherit; text-align: left; width: 100%;">
+              <span style="{{ c.boxStyle }}">{{ c.check }}</span>
+              <span style="{{ c.labelStyle }}">{{ c.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: #ffffff;">
+
+      <!-- MONTH VIEW -->
+      <sc-if value="{{ isMonth }}" hint-placeholder-val="{{ true }}">
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid #e6e9ef;">
+          <sc-for list="{{ weekdayHeaders }}" as="w" hint-placeholder-count="7">
+            <div style="{{ w.style }}">{{ w.label }}</div>
+          </sc-for>
+        </div>
+        <div style="flex: 1; display: grid; grid-template-rows: repeat(6, 1fr); min-height: 0;">
+          <sc-for list="{{ monthWeeks }}" as="week" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr);">
+              <sc-for list="{{ week.days }}" as="day" hint-placeholder-count="7">
+                <div onClick="{{ day.onClick }}" style="{{ day.cellStyle }}">
+                  <div style="display: flex; justify-content: center; padding-top: 5px;">
+                    <span style="{{ day.numStyle }}">{{ day.num }}</span>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 2px; padding: 3px 5px 0;">
+                    <sc-for list="{{ day.events }}" as="ev" hint-placeholder-count="0">
+                      <div onClick="{{ ev.onClick }}" style="{{ ev.pillStyle }}">
+                        <sc-if value="{{ ev.showDot }}" hint-placeholder-val="{{ false }}">
+                          <span style="{{ ev.dotStyle }}"></span>
+                        </sc-if>
+                        <span style="{{ ev.timeStyle }}">{{ ev.timeLabel }}</span>
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ ev.title }}</span>
+                      </div>
+                    </sc-for>
+                    <sc-if value="{{ day.hasMore }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size: 11px; color: #8a919c; font-weight: 500; padding: 1px 6px; cursor: pointer;">{{ day.moreLabel }}</div>
+                    </sc-if>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <!-- WEEK / DAY VIEW -->
+      <sc-if value="{{ isTimeGrid }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; height: 100%; min-height: 0;">
+          <div style="display: grid; grid-template-columns: 56px 1fr; border-bottom: 1px solid #e6e9ef;">
+            <div></div>
+            <div style="display: grid; grid-template-columns: {{ timeColsTemplate }};">
+              <sc-for list="{{ timeGridDays }}" as="d" hint-placeholder-count="7">
+                <div style="{{ d.headerStyle }}">
+                  <span style="font-size: 11px; color: #8a919c; font-weight: 500;">{{ d.weekday }}</span>
+                  <span style="{{ d.numStyle }}">{{ d.num }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex: 1; overflow-y: auto; min-height: 0;">
+            <div style="display: grid; grid-template-columns: 56px 1fr;">
+              <div>
+                <sc-for list="{{ hourLabels }}" as="h" hint-placeholder-count="15">
+                  <div style="height: 56px; position: relative;">
+                    <span style="position: absolute; top: -8px; right: 10px; font-size: 11px; color: #a0a6b0; font-family: 'IBM Plex Mono', monospace;">{{ h }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display: grid; grid-template-columns: {{ timeColsTemplate }};">
+                <sc-for list="{{ timeGridDays }}" as="d" hint-placeholder-count="7">
+                  <div style="{{ d.colStyle }}">
+                    <sc-for list="{{ hourLabels }}" as="h" hint-placeholder-count="15">
+                      <div style="height: 56px; border-bottom: 1px solid #eef0f4;"></div>
+                    </sc-for>
+                    <sc-for list="{{ d.events }}" as="ev" hint-placeholder-count="0">
+                      <div onClick="{{ ev.onClick }}" style="{{ ev.blockStyle }}">
+                        <div style="font-weight: 600; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ ev.title }}</div>
+                        <div style="font-size: 11px; opacity: 0.8;">{{ ev.timeLabel }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- AGENDA VIEW -->
+      <sc-if value="{{ isAgenda }}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; overflow-y: auto; padding: 8px 0;">
+          <sc-for list="{{ agendaGroups }}" as="g" hint-placeholder-count="6">
+            <div style="display: grid; grid-template-columns: 140px 1fr; padding: 14px 32px; border-bottom: 1px solid #f0f1f4;">
+              <div style="padding-top: 4px;">
+                <div style="{{ g.numStyle }}">{{ g.num }}</div>
+                <div style="font-size: 12px; color: #8a919c; margin-top: 2px;">{{ g.weekday }}</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <sc-for list="{{ g.events }}" as="ev" hint-placeholder-count="2">
+                  <div onClick="{{ ev.onClick }}" style="display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-radius: 10px; cursor: pointer; border: 1px solid #eceef3;" style-hover="background: #f7f8fa;">
+                    <span style="{{ ev.dotStyle }}"></span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #6b7280; width: 96px; flex-shrink: 0;">{{ ev.timeLabel }}</span>
+                    <span style="font-size: 14px; font-weight: 500; flex: 1;">{{ ev.title }}</span>
+                    <span style="{{ ev.tagStyle }}">{{ ev.calLabel }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+    </main>
+
+    <!-- DETAIL PANEL -->
+    <sc-if value="{{ hasSelection }}" hint-placeholder-val="{{ false }}">
+      <aside style="width: 352px; flex-shrink: 0; background: #ffffff; border-left: 1px solid #e6e9ef; display: flex; flex-direction: column; animation: panelIn 0.18s ease; z-index: 10;">
+        <div style="{{ selDetail.headerStyle }}">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+            <span style="{{ selDetail.tagStyle }}">{{ selDetail.calLabel }}</span>
+            <button onClick="{{ closePanel }}" style="width: 30px; height: 30px; border: none; background: rgba(255,255,255,0.55); border-radius: 8px; cursor: pointer; color: #4a4f57; font-size: 15px; flex-shrink: 0;">✕</button>
+          </div>
+          <h2 style="font-size: 21px; font-weight: 700; letter-spacing: -0.5px; margin: 14px 0 0; line-height: 1.25;">{{ selDetail.title }}</h2>
+        </div>
+
+        <div style="flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 13px;">
+              <span style="font-size: 15px; color: #9aa1ac; width: 18px; text-align: center;">◷</span>
+              <div>
+                <div style="font-size: 14px; font-weight: 500;">{{ selDetail.dateLabel }}</div>
+                <div style="font-size: 13px; color: #6b7280; margin-top: 1px;">{{ selDetail.timeLabel }}</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 13px;">
+              <span style="font-size: 15px; color: #9aa1ac; width: 18px; text-align: center;">⚑</span>
+              <div style="font-size: 14px;">{{ selDetail.location }}</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 13px;">
+              <span style="font-size: 15px; color: #9aa1ac; width: 18px; text-align: center;">◔</span>
+              <div style="font-size: 14px; color: #33383f;">{{ selDetail.reminder }}</div>
+            </div>
+          </div>
+
+          <div style="height: 1px; background: #eceef3;"></div>
+
+          <div>
+            <div style="font-size: 12px; font-weight: 600; color: #8a919c; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 12px;">참석자 · {{ selDetail.attendeeCount }}</div>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <sc-for list="{{ selDetail.attendees }}" as="a" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 11px;">
+                  <span style="{{ a.avatarStyle }}">{{ a.initial }}</span>
+                  <div style="flex: 1;">
+                    <div style="font-size: 13.5px; font-weight: 500;">{{ a.name }}</div>
+                  </div>
+                  <span style="{{ a.statusStyle }}">{{ a.status }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <button style="margin-top: 14px; width: 100%; height: 38px; border: 1px dashed #d6dae2; background: #fafbfc; border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 500; color: #6b7280; cursor: pointer;">＋ 사람 초대</button>
+          </div>
+
+          <div style="height: 1px; background: #eceef3;"></div>
+
+          <div>
+            <div style="font-size: 12px; font-weight: 600; color: #8a919c; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 10px;">메모</div>
+            <p style="font-size: 13.5px; line-height: 1.6; color: #4a4f57; margin: 0;">{{ selDetail.description }}</p>
+          </div>
+
+          <div style="height: 1px; background: #eceef3;"></div>
+
+          <div>
+            <div style="font-size: 12px; font-weight: 600; color: #8a919c; letter-spacing: 0.3px; text-transform: uppercase; margin-bottom: 14px;">댓글 · {{ selDetail.commentCount }}</div>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <sc-for list="{{ selDetail.comments }}" as="c" hint-placeholder-count="1">
+                <div style="display: flex; gap: 11px;">
+                  <span style="{{ c.avatarStyle }}">{{ c.initial }}</span>
+                  <div style="flex: 1;">
+                    <div style="display: flex; align-items: baseline; gap: 8px;">
+                      <span style="font-size: 13px; font-weight: 600;">{{ c.who }}</span>
+                      <span style="font-size: 11.5px; color: #a0a6b0;">{{ c.time }}</span>
+                    </div>
+                    <div style="font-size: 13.5px; color: #33383f; line-height: 1.5; margin-top: 3px;">{{ c.text }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="padding: 14px 20px; border-top: 1px solid #eceef3; display: flex; align-items: center; gap: 10px;">
+          <span style="width: 30px; height: 30px; border-radius: 50%; background: #16181d; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">유</span>
+          <div style="flex: 1; height: 38px; display: flex; align-items: center; padding: 0 14px; background: #f4f5f7; border-radius: 19px; font-size: 13px; color: #9aa1ac;">댓글 추가…</div>
+        </div>
+      </aside>
+    </sc-if>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    view: 'month',
+    y: 2026, m: 6,
+    selDay: 7,
+    selEventId: 1,
+    calOn: { personal: true, work: true, meeting: true, deadline: true, team: true, family: true },
+  };
+
+  CATS = {
+    personal: { label: '내 일정', bg: '#e7f4ee', fg: '#0f6e45', dot: '#1f8a5b' },
+    work:     { label: '업무',    bg: '#e8effb', fg: '#1e4fa8', dot: '#3b6fd4' },
+    meeting:  { label: '회의',    bg: '#efeafc', fg: '#5a3fb0', dot: '#7c5cdb' },
+    deadline: { label: '마감',    bg: '#fbeee7', fg: '#b4552f', dot: '#d97757' },
+    team:     { label: '팀 공유', bg: '#e4f3f4', fg: '#0a6d76', dot: '#0e9aa7' },
+    family:   { label: '가족',    bg: '#fdeef4', fg: '#a83a72', dot: '#d95a97' },
+  };
+
+  EVENTS = [
+  ];
+
+  WD = ['일', '월', '화', '수', '목', '금', '토'];
+
+  fmtTime(t) {
+    const h = Math.floor(t);
+    const mn = Math.round((t - h) * 60);
+    const ap = h < 12 ? '오전' : '오후';
+    let hh = h % 12; if (hh === 0) hh = 12;
+    return ap + ' ' + hh + ':' + String(mn).padStart(2, '0');
+  }
+  fmtHour(h) {
+    const ap = h < 12 ? 'AM' : 'PM';
+    let hh = h % 12; if (hh === 0) hh = 12;
+    return hh + ' ' + ap;
+  }
+
+  visibleEvents() {
+    return this.EVENTS.filter(e => this.state.calOn[e.cal]);
+  }
+
+  goToday = () => this.setState({ y: 2026, m: 6, selDay: 7 });
+  prevPeriod = () => {
+    if (this.state.view === 'month' || this.state.view === 'agenda') {
+      let m = this.state.m - 1, y = this.state.y;
+      if (m < 0) { m = 11; y--; }
+      this.setState({ m, y });
+    } else {
+      this.setState({ selDay: this.state.selDay - (this.state.view === 'week' ? 7 : 1) });
+    }
+  };
+  nextPeriod = () => {
+    if (this.state.view === 'month' || this.state.view === 'agenda') {
+      let m = this.state.m + 1, y = this.state.y;
+      if (m > 11) { m = 0; y++; }
+      this.setState({ m, y });
+    } else {
+      this.setState({ selDay: this.state.selDay + (this.state.view === 'week' ? 7 : 1) });
+    }
+  };
+  openCreate = () => {};
+
+  renderVals() {
+    const S = this.state;
+    const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+    const periodLabel = S.y + '년 ' + monthNames[S.m];
+
+    const isMonth = S.view === 'month';
+    const isWeek = S.view === 'week';
+    const isDay = S.view === 'day';
+    const isAgenda = S.view === 'agenda';
+    const isTimeGrid = isWeek || isDay;
+
+    // View tabs
+    const tabDefs = [['month','월'],['week','주'],['day','일'],['agenda','아젠다']];
+    const viewTabs = tabDefs.map(([v, label]) => ({
+      label,
+      onClick: () => this.setState({ view: v }),
+      style: 'height:30px;padding:0 16px;border:none;border-radius:7px;white-space:nowrap;font-family:inherit;font-size:13px;font-weight:' + (S.view===v?'600':'500') + ';cursor:pointer;background:' + (S.view===v?'#fff':'transparent') + ';color:' + (S.view===v?'#16181d':'#6b7280') + ';box-shadow:' + (S.view===v?'0 1px 2px rgba(0,0,0,0.08)':'none') + ';',
+    }));
+
+    // Weekday headers (month)
+    const weekdayHeaders = this.WD.map((label, i) => ({
+      label,
+      style: 'text-align:center;padding:10px 0;font-size:12px;font-weight:600;color:' + (i===0?'#d95a5a':(i===6?'#3b6fd4':'#8a919c')) + ';border-right:1px solid #f0f1f4;',
+    }));
+
+    // Month grid
+    const evByDay = {};
+    this.visibleEvents().forEach(e => { (evByDay[e.day] = evByDay[e.day] || []).push(e); });
+    Object.values(evByDay).forEach(arr => arr.sort((a,b)=>a.start-b.start));
+
+    const first = new Date(S.y, S.m, 1);
+    const startOffset = first.getDay();
+    const monthWeeks = [];
+    for (let w = 0; w < 6; w++) {
+      const days = [];
+      for (let dow = 0; dow < 7; dow++) {
+        const cellDate = new Date(S.y, S.m, 1 - startOffset + w*7 + dow);
+        const inMonth = cellDate.getMonth() === S.m;
+        const num = cellDate.getDate();
+        const isToday = inMonth && S.y===2026 && S.m===6 && num===7;
+        const isSel = inMonth && num === S.selDay;
+        const dayEvents = inMonth ? (evByDay[num] || []) : [];
+        const shown = dayEvents.slice(0, 3);
+        const events = shown.map(e => {
+          const c = this.CATS[e.cal];
+          if (e.end - e.start >= 3) {
+            return { title: e.title, timeLabel: '', showDot: false, onClick: () => this.setState({ selEventId: e.id }),
+              pillStyle: 'display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:500;padding:2px 7px;border-radius:5px;cursor:pointer;background:'+c.dot+';color:#fff;overflow:hidden;',
+              dotStyle: '', timeStyle: 'display:none;' };
+          }
+          return { title: e.title, timeLabel: '', showDot: true, onClick: () => this.setState({ selEventId: e.id }),
+            pillStyle: 'display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;padding:2px 6px;border-radius:5px;cursor:pointer;color:#33383f;overflow:hidden;',
+            dotStyle: 'width:7px;height:7px;border-radius:50%;flex-shrink:0;background:'+c.dot+';',
+            timeStyle: 'display:none;' };
+        });
+        const moreCount = dayEvents.length - shown.length;
+        days.push({
+          num,
+          onClick: () => { if (inMonth) this.setState({ selDay: num }); },
+          cellStyle: 'border-right:1px solid #f0f1f4;border-bottom:1px solid #f0f1f4;padding-bottom:4px;overflow:hidden;cursor:pointer;background:' + (isSel ? '#f7f8fb' : (inMonth ? '#fff' : '#fafbfc')) + ';',
+          numStyle: 'display:flex;align-items:center;justify-content:center;min-width:24px;height:24px;border-radius:50%;font-size:12.5px;font-weight:' + (isToday?'700':'500') + ';font-variant-numeric:tabular-nums;background:' + (isToday?'#16181d':'transparent') + ';color:' + (isToday?'#fff':(inMonth?'#33383f':'#c2c7d0')) + ';',
+          events,
+          hasMore: moreCount > 0,
+          moreLabel: '+' + moreCount + ' 더보기',
+        });
+      }
+      monthWeeks.push({ days });
+    }
+
+    // Mini calendar
+    const miniHeaders = this.WD;
+    const miniDays = [];
+    for (let i = 0; i < 42; i++) {
+      const cd = new Date(S.y, S.m, 1 - startOffset + i);
+      const inM = cd.getMonth() === S.m;
+      const num = cd.getDate();
+      const isToday = inM && S.y===2026 && S.m===6 && num===7;
+      const isSel = inM && num === S.selDay;
+      miniDays.push({
+        num,
+        onClick: () => { if (inM) this.setState({ selDay: num }); },
+        style: 'width:28px;height:28px;border:none;border-radius:50%;font-family:inherit;font-size:11.5px;font-variant-numeric:tabular-nums;cursor:pointer;font-weight:'+(isToday||isSel?'600':'400')+';background:'+(isToday?'#16181d':(isSel?'#e6e9ef':'transparent'))+';color:'+(isToday?'#fff':(inM?'#33383f':'#c8ccd4'))+';',
+      });
+    }
+
+    // Calendars
+    const mkCal = (key) => {
+      const c = this.CATS[key]; const on = S.calOn[key];
+      return {
+        label: c.label,
+        onToggle: () => this.setState(s => ({ calOn: { ...s.calOn, [key]: !s.calOn[key] } })),
+        check: on ? '✓' : '',
+        boxStyle: 'width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff;border:'+(on?'none':'1.5px solid #cfd4dd')+';background:'+(on?c.dot:'transparent')+';',
+        labelStyle: 'font-size:13.5px;font-weight:500;color:'+(on?'#33383f':'#9aa1ac')+';',
+      };
+    };
+    const myCalendars = ['personal','work','meeting','deadline'].map(mkCal);
+    const sharedCalendars = ['team','family'].map(mkCal);
+
+    // Time grid (week/day)
+    let gridDayNums;
+    if (isWeek) {
+      const base = new Date(S.y, S.m, S.selDay);
+      const dow = base.getDay();
+      gridDayNums = [];
+      for (let i = 0; i < 7; i++) gridDayNums.push(new Date(S.y, S.m, S.selDay - dow + i));
+    } else {
+      gridDayNums = [new Date(S.y, S.m, S.selDay)];
+    }
+    const HSTART = 7, HEND = 22, PX = 56;
+    const hourLabels = [];
+    for (let h = HSTART; h < HEND; h++) hourLabels.push(this.fmtHour(h));
+    const timeColsTemplate = 'repeat(' + gridDayNums.length + ', 1fr)';
+    const timeGridDays = gridDayNums.map(cd => {
+      const inM = cd.getMonth() === S.m;
+      const num = cd.getDate();
+      const isToday = inM && S.y===2026 && S.m===6 && num===7;
+      const dayEvts = (inM ? (evByDay[num] || []) : []).map(e => {
+        const c = this.CATS[e.cal];
+        const top = (e.start - HSTART) * PX;
+        const height = Math.max((e.end - e.start) * PX - 3, 22);
+        return {
+          title: e.title,
+          timeLabel: this.fmtTime(e.start) + ' – ' + this.fmtTime(e.end),
+          onClick: () => this.setState({ selEventId: e.id }),
+          blockStyle: 'position:absolute;left:4px;right:4px;top:'+top+'px;height:'+height+'px;background:'+c.bg+';color:'+c.fg+';border-left:3px solid '+c.dot+';border-radius:6px;padding:5px 8px;cursor:pointer;overflow:hidden;',
+        };
+      });
+      return {
+        weekday: this.WD[cd.getDay()],
+        num: String(num),
+        headerStyle: 'display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0;border-right:1px solid #f0f1f4;'+(isDay?'':''),
+        numStyle: 'display:flex;align-items:center;justify-content:center;min-width:30px;height:30px;border-radius:50%;font-size:16px;font-weight:'+(isToday?'700':'600')+';background:'+(isToday?'#16181d':'transparent')+';color:'+(isToday?'#fff':'#33383f')+';font-variant-numeric:tabular-nums;',
+        colStyle: 'position:relative;border-right:1px solid #f0f1f4;',
+        events: dayEvts,
+      };
+    });
+
+    // Agenda
+    const agendaGroups = [];
+    const daysWithEvents = Object.keys(evByDay).map(Number).sort((a,b)=>a-b);
+    daysWithEvents.forEach(dnum => {
+      const cd = new Date(S.y, S.m, dnum);
+      const isToday = S.y===2026 && S.m===6 && dnum===7;
+      agendaGroups.push({
+        num: String(dnum),
+        weekday: this.WD[cd.getDay()] + '요일',
+        numStyle: 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;border-radius:10px;font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;background:'+(isToday?'#16181d':'#f4f5f7')+';color:'+(isToday?'#fff':'#33383f')+';',
+        events: evByDay[dnum].map(e => {
+          const c = this.CATS[e.cal];
+          return {
+            title: e.title,
+            calLabel: c.label,
+            timeLabel: this.fmtTime(e.start),
+            onClick: () => this.setState({ selEventId: e.id }),
+            dotStyle: 'width:9px;height:9px;border-radius:50%;flex-shrink:0;background:'+c.dot+';',
+            tagStyle: 'font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:'+c.bg+';color:'+c.fg+';',
+          };
+        }),
+      });
+    });
+
+    // Detail panel
+    const sel = this.EVENTS.find(e => e.id === S.selEventId);
+    const hasSelection = !!sel;
+    let selDetail = null;
+    if (sel) {
+      const c = this.CATS[sel.cal];
+      const cd = new Date(S.y, 6, sel.day);
+      const dateLabel = '7월 ' + sel.day + '일 (' + this.WD[cd.getDay()] + ')';
+      selDetail = {
+        title: sel.title,
+        calLabel: c.label,
+        tagStyle: 'display:inline-flex;font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:20px;background:rgba(255,255,255,0.6);color:'+c.fg+';',
+        headerStyle: 'padding:22px 24px 20px;background:'+c.bg+';',
+        dateLabel,
+        timeLabel: this.fmtTime(sel.start) + ' – ' + this.fmtTime(sel.end),
+        location: sel.loc,
+        reminder: sel.reminder,
+        description: sel.desc,
+        attendeeCount: sel.attendees.length,
+        attendees: sel.attendees.map(([name, status]) => ({
+          name, initial: name[0], status,
+          avatarStyle: 'width:32px;height:32px;border-radius:50%;background:#eceef3;color:#4a4f57;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:600;flex-shrink:0;',
+          statusStyle: 'font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:20px;background:'+(status==='수락'?'#e7f4ee':'#f4f5f7')+';color:'+(status==='수락'?'#0f6e45':'#8a919c')+';',
+        })),
+        commentCount: sel.comments.length,
+        comments: sel.comments.map(([who, time, text]) => ({
+          who, time, text, initial: who[0],
+          avatarStyle: 'width:30px;height:30px;border-radius:50%;background:#eceef3;color:#4a4f57;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;',
+        })),
+      };
+    }
+
+    return {
+      periodLabel, viewTabs, isMonth, isTimeGrid, isAgenda,
+      weekdayHeaders, monthWeeks,
+      miniHeaders, miniDays,
+      myCalendars, sharedCalendars,
+      hourLabels, timeColsTemplate, timeGridDays,
+      agendaGroups,
+      hasSelection, selDetail,
+      goToday: this.goToday, prevPeriod: this.prevPeriod, nextPeriod: this.nextPeriod, openCreate: this.openCreate,
+      closePanel: () => this.setState({ selEventId: null }),
+    };
+  }
+}
+</script>
+</body>
+</html>
