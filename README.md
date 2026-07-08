@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Handoff: Planora 랜딩페이지
 
 ## Overview
@@ -112,3 +113,7 @@ design_handoff_planora_landing/
    └─ planora-landing.css            # 리셋·폰트·hover 상태
 ```
 > 캘린더 앱 본체 화면(`Planora Calendar.dc.html`)도 같은 토큰을 씁니다. 앱 화면 핸드오프가 필요하면 별도 요청해 주세요.
+=======
+# Plantropic
+ai agent,web ,mobile planner
+>>>>>>> 27815429a34d03b7daf3265f094dfac0decac0e4
