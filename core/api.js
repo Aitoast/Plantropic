@@ -1,34 +1,6 @@
-import type { CalEvent } from "./event";
-
-export interface EventApi {
-  list(): Promise<CalEvent[]>;
-  create(e: Omit<CalEvent, "id">): Promise<CalEvent>;
-  update(id: string, e: Partial<CalEvent>): Promise<CalEvent>;
-  remove(id: string): Promise<void>;
-}
-
-export function createEventApi(baseUrl: string, getToken: () => string | null): EventApi {
-  const req = async (path: string, init?: RequestInit) => {
-    const token = getToken();
-    const res = await fetch(`${baseUrl}${path}`, {
-      ...init,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...(init?.headers || {}),
-      },
-    });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    return res.status === 204 ? null : res.json();
-  };
-  return {
-    list: () => req("/events"),
-    create: (e) => req("/events", { method: "POST", body: JSON.stringify(e) }),
-    update: (id, e) => req(`/events/${id}`, { method: "PATCH", body: JSON.stringify(e) }),
-    remove: (id) => req(`/events/${id}`, { method: "DELETE" }),
-  };
-}
-
+// core/api.js — 웹·모바일 공용 API 클라이언트 (프레임워크 무관, fetch만 사용)
+//   const api = createApi("/api", () => getToken());   // 웹(Vite 프록시)
+//   const api = createApi("http://192.168.0.15:4000/api", () => auth.getToken()); // 모바일
 export function createApi(baseUrl, getToken) {
   const req = async (path, init = {}) => {
     const token = typeof getToken === "function" ? await getToken() : getToken;
@@ -44,11 +16,19 @@ export function createApi(baseUrl, getToken) {
     if (!res.ok) throw new Error(data?.message || `요청 실패 (${res.status})`);
     return data;
   };
+
   return {
-    signup: (name, email, password) => req("/auth/signup", { method: "POST", body: JSON.stringify({ name, email, password }) }),
-    login: (email, password) => req("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
+    // 인증
+    signup: (name, email, password) =>
+      req("/auth/signup", { method: "POST", body: JSON.stringify({ name, email, password }) }),
+    login: (email, password) =>
+      req("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }),
     me: () => req("/auth/me"),
-    listEvents: (params = {}) => { const q = new URLSearchParams(params).toString(); return req(`/events${q ? `?${q}` : ""}`); },
+    // 일정 CRUD (서버가 user_id 로 격리)
+    listEvents: (params = {}) => {
+      const q = new URLSearchParams(params).toString();
+      return req(`/events${q ? `?${q}` : ""}`);
+    },
     createEvent: (e) => req("/events", { method: "POST", body: JSON.stringify(e) }),
     updateEvent: (id, patch) => req(`/events/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
     deleteEvent: (id) => req(`/events/${id}`, { method: "DELETE" }),

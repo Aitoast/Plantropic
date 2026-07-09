@@ -6,7 +6,7 @@ import { colors as c, fonts, TIME_GRID } from './tokens-calendar';
 import { CATS, WEEKDAYS, EVENTS, MONTH_NAMES, TODAY, fmtTime, fmtHour } from './calendarData';
 import './planora-calendar.css';
 
-const api = createApi(import.meta.env.VITE_API_URL ?? "http://localhost:4000/api",
+const api = createApi(import.meta.env.VITE_API_URL ?? "/api",
                       () => localStorage.getItem("planora.token"));
 
 const isTodayCell = (num, inMonth, y, m) =>

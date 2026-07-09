@@ -1,1 +1,1 @@
-{ "name": "@scheduler/core", "version": "1.0.0", "main": "calendar.js", "private": true }
+{ "name": "@scheduler/core", "version": "1.0.0", "type": "module", "main": "calendar.js", "private": true }
