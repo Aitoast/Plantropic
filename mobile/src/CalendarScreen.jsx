@@ -1,3 +1,5 @@
+import React, { useState, useMemo } from "react";
+import { View, Text, Pressable, ScrollView, StyleSheet, StatusBar, Platform, RefreshControl } from "react-native";
 import { CATS, WD, fmtTime } from "@scheduler/core/calendar";   // SEED_EVENTS 제거
 import { createApi } from "@scheduler/core/api";
 import { useEventStore } from "@scheduler/core/useEventStore";
@@ -6,12 +8,12 @@ import { auth } from "./auth";
 import EventSheet from "./EventSheet";
 
 const api = createApi(
-  process.env.EXPO_PUBLIC_API_URL ?? "http://192.168.0.15:4000/api",
+  process.env.EXPO_PUBLIC_API_URL ?? "http://172.30.1.20:4000/api",
   () => auth.getToken()
 );
 
 const DARK = "#16181d";
-const TODAY = { y: 2026, m: 6, d: 7 };   // 데모 기준일 (실서비스: new Date())
+const TODAY = { y: 2026, m: 6, d: 7 };   
 const MONTHS = [
   "1월", "2월", "3월", "4월", "5월", "6월", 
   "7월", "8월", "9월", "10월", "11월", "12월"
@@ -26,6 +28,13 @@ export default function CalendarScreen() {
   () => store.events.map(toUiEvent).filter((e) => e.year === cursor.y && e.month === cursor.m),
   [store.events, cursor]);
   const [sheet, setSheet] = useState(null);       // null | {} | event
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try { await store.reload(); } finally { setRefreshing(false); }
+  };
 
   // 일자별 그룹
   const evByDay = useMemo(() => {
@@ -124,7 +133,8 @@ export default function CalendarScreen() {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}
+  refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16181d" />}>
         {/* 월 그리드 */}
         {view === "month" && (
           <View style={styles.calBlock}>
