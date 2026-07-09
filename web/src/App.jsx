@@ -26,10 +26,14 @@ function App() {
       /* 로그인 페이지*/
       view === 'login' ? (
         <LoginPage
-        onLoginSuccess={() => setView('calendar')} // 로그인 성공시 달력화면
-        onBackToLanding = {() => setView('landing')}
+          onAuthed={(user) => {
+            console.log("인증 성공한 유저:", user);
+            setView('calendar'); // 로그인 성공시 달력화면으로 전환
+          }} 
+          // 만약 LoginPage에 '뒤로가기' 버튼이 있다면 아래 prop도 사용됩니다.
+          // onBackToLanding = {() => setView('landing')} 
         />
-      ) :
+      ):
       (
         <PlanoraCalendar onLogout={() => setView('landing')} />
       )}

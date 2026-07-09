@@ -47,3 +47,4 @@ export function normalize(input: EventInput): { ok: true; value: Omit<CalEvent, 
     },
   };
 }
+

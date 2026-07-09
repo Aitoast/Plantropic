@@ -1,0 +1,21 @@
+{
+  "name": "planora-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Planora 인증 + 일정 API (Express). DB 없이 인메모리로 바로 구동되고, DATABASE_URL 설정 시 PostgreSQL 사용.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test:smoke": "node smoke-test.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "optionalDependencies": {
+    "pg": "^8.13.1"
+  }
+}

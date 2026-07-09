@@ -21,12 +21,4 @@ export const fmtTime = (t) => {
 };
 
 export const SEED_EVENTS = [
-  { id: 1, cal: "meeting",  title: "주간 팀 스탠드업", day: 7,  start: 9,    end: 9.5,  loc: "회의실 A · Google Meet" },
-  { id: 2, cal: "work",     title: "제품 스펙 문서 리뷰", day: 7,  start: 11,   end: 12,   loc: "Notion 문서" },
-  { id: 3, cal: "personal", title: "점심 - 지수",       day: 7,  start: 12.5, end: 13.5, loc: "성수동 카페거리" },
-  { id: 4, cal: "deadline", title: "분기 보고서 제출",   day: 7,  start: 17,   end: 18,   loc: "온라인 제출" },
-  { id: 5, cal: "meeting",  title: "디자인 싱크",       day: 8,  start: 14,   end: 15,   loc: "회의실 B" },
-  { id: 8, cal: "team",     title: "전사 타운홀",       day: 9,  start: 10,   end: 11,   loc: "대강당" },
-  { id: 13, cal: "work",    title: "스프린트 계획",     day: 13, start: 13,   end: 14.5, loc: "회의실 C" },
-  { id: 20, cal: "personal",title: "주말 등산",         day: 25, start: 8,    end: 12,   loc: "북한산" },
 ];
