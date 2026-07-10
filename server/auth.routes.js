@@ -1,6 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { randomUUID } from "crypto";
 import { db } from "./db.js";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-only-insecure-secret-change-me";
@@ -8,11 +9,13 @@ if (!process.env.JWT_SECRET) {
   console.log("⚠  JWT_SECRET 미설정 → 개발용 임시 키 사용. 운영 전 반드시 .env 에 설정해야 합니다.");
 }
 
+const BOOT_ID = randomUUID();
+
 const router = Router();
 const h = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
 function sign(user) {
-  return jwt.sign({ sub: user.id }, JWT_SECRET, { expiresIn: "30d" });
+  return jwt.sign({ sub: user.id, boot: BOOT_ID }, JWT_SECRET, { expiresIn: "30d" });
 }
 function publicUser(u) {
   return { id: u.id, name: u.name, email: u.email, avatarUrl: u.avatar_url ?? null };
@@ -23,7 +26,10 @@ export function requireAuth(req, res, next) {
   const token = header.startsWith("Bearer ") ? header.slice(7) : null;
   if (!token) return res.status(401).json({ message: "로그인이 필요합니다." });
   try {
-    req.userId = jwt.verify(token, JWT_SECRET).sub;
+    const payload = jwt.verify(token, JWT_SECRET);
+    if (payload.boot !== BOOT_ID)
+      return res.status(401).json({ message: "서버가 재시작되어 다시 로그인해야 해요." });
+    req.userId = payload.sub;
     next();
   } catch {
     res.status(401).json({ message: "세션이 만료됐습니다. 다시 로그인하여 주십시요." });
@@ -32,6 +38,8 @@ export function requireAuth(req, res, next) {
 
 // ── 회원가입 ──
 router.post("/signup", h(async (req, res) => {
+  if (process.env.ALLOW_SIGNUP === "false")
+    return res.status(403).json({ message: "회원가입이 비활성화되어 있어요. 등록된 계정으로 로그인해주세요." });
   const { name, email, password } = req.body ?? {};
   if (!name?.trim() || !email?.trim() || !password)
     return res.status(400).json({ message: "필수 항목을 입력해주세요." });

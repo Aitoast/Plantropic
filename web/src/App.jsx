@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
@@ -10,36 +10,41 @@ import './pages/LoginPage.css';
 import PlanoraLanding from './PlanoraLanding'; 
 import PlanoraCalendar from './PlanoraCalendar';
 import LoginPage from './pages/LoginPage';
+import { auth } from './auth/authClient';
 
 
 function App() {
-  // 'landing' 또는 'calendar' 상태를 가집니다.
   const [view, setView] = useState('landing');
+  const [checking, setChecking] = useState(true);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    auth.consumeOAuthRedirect();
+    auth.me()
+      .then((user) => { if (user) { setAuthed(true); setView('calendar'); } })
+      .finally(() => setChecking(false));
+  }, []);
+
+  if (checking) {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8a919c' }}>불러오는 중…</div>;
+  }
 
   return (
     <div>
       {view === 'landing' ? (
-        // 랜딩페이지 컴포넌트에 화면을 바꾸는 함수(setView)를 프롭스로 전달합니다.
-        <PlanoraLanding onStart={() => setView('login')} />
-      ) : 
-      
-      /* 로그인 페이지*/
-      view === 'login' ? (
-        <LoginPage
-          onAuthed={(user) => {
-            console.log("인증 성공한 유저:", user);
-            setView('calendar'); // 로그인 성공시 달력화면으로 전환
-          }} 
-          // 만약 LoginPage에 '뒤로가기' 버튼이 있다면 아래 prop도 사용됩니다.
-          // onBackToLanding = {() => setView('landing')} 
+        <PlanoraLanding onStart={() => setView(authed ? 'calendar' : 'login')} />
+      ) : view === 'login' ? (
+        <LoginPage onAuthed={(user) => { setAuthed(true); setView('calendar'); }} />
+      ) : (
+        <PlanoraCalendar
+          onHome={() => setView('landing')}                               /* 로고: 랜딩으로(로그아웃 X) */
+          onLogout={() => { auth.logout(); setAuthed(false); setView('landing'); }}
         />
-      ):
-      (
-        <PlanoraCalendar onLogout={() => setView('landing')} />
       )}
     </div>
   );
 }
+
 // function App() {
 //   return (
 //     <div className="App">

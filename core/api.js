@@ -29,6 +29,8 @@ export function createApi(baseUrl, getToken) {
       const q = new URLSearchParams(params).toString();
       return req(`/events${q ? `?${q}` : ""}`);
     },
+    getSuggestions: (weekStart) => req(`/ai/suggestions${weekStart ? `?weekStart=${weekStart}` : ""}`),
+    getTravel: () => req("/ai/travel"),
     createEvent: (e) => req("/events", { method: "POST", body: JSON.stringify(e) }),
     updateEvent: (id, patch) => req(`/events/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
     deleteEvent: (id) => req(`/events/${id}`, { method: "DELETE" }),

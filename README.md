@@ -1,33 +1,18 @@
 <<<<<<< HEAD
-# Handoff: Planora 랜딩페이지
+# Handoff: Plantropic 랜딩페이지
 
 ## Overview
-Planora(웹·모바일 공용 협업 스케줄러)의 마케팅 랜딩페이지입니다. 방문자에게 제품 가치를 소개하고 회원가입(무료 시작)으로 전환시키는 것이 목표입니다. 캘린더 앱 본체와 동일한 디자인 시스템(IBM Plex Sans, 블랙 포인트, 카테고리 색상)을 공유합니다.
-
+Plantropic - 웹·모바일 공용 협업 스케줄러 입니다.
+AI agent 를 더해 사용자의 패턴에 대해 다음 일정 조언 및 질의, 팀프로젝트 케이스 관리 등의 역활을 도와줍니다.
 ## Fidelity
 
 
 ## Tech Context
-- 프론트: React (Vite / Next / CRA 어디든 호환). 환경: Windows · VS Code.
-- 백엔드: FastAPI 고려 중 → 이 랜딩은 정적 프론트로 배포하고, 앱 화면에서 일정 CRUD·공유·알림 API를 FastAPI와 연동하는 구조를 권장.
+- 프론트: React. 환경: Windows · VS Code.
+- 백엔드: Express 와 plqs bd로 구성
 
 ## 빠른 시작 (참고 구현 실행)
-```bash
-# 예: Vite React 프로젝트
-npm create vite@latest planora -- --template react
-cd planora && npm install
-# 이 번들의 src/ 내용을 프로젝트 src/ 로 복사
-```
-```jsx
-// App.jsx
-import PlanoraLanding from './PlanoraLanding';
-export default function App() {
-  return <PlanoraLanding
-    desktopShot="/shots/app.png"   // 없으면 플레이스홀더 표시
-    mobileShot="/shots/app-mobile.png"
-  />;
-}
-```
+
 
 
 

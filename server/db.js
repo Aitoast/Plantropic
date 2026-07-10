@@ -93,7 +93,8 @@ function joinCal(e, cal) {
 // ── PostgreSQL 저장소 ─────────────────────────────────────
 async function pgStore(connectionString) {
   const { Pool } = await import("pg");
-  const pool = new Pool({ connectionString });
+  const needSsl = /sslmode=require|neon\.tech|supabase|render\.com|amazonaws|azure/.test(connectionString);
+  const pool = new Pool({ connectionString, ssl: needSsl ? { rejectUnauthorized: false } : undefined });
   const one = async (sql, params) => (await pool.query(sql, params)).rows[0] ?? null;
 
   return {

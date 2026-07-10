@@ -87,7 +87,7 @@ function useEvents(initial = []) {
 }
 
 // ---- 루트 컴포넌트 ---------------------------------------------------------
-export default function PlanoraCalendar() {
+export default function PlanoraCalendar({ onHome, onLogout }) {
   const [view, setView] = useState('month');
   const [{ y, m }, setYM] = useState({ y: TODAY.y, m: TODAY.m });
   const [selDay, setSelDay] = useState(TODAY.d);
@@ -139,7 +139,7 @@ export default function PlanoraCalendar() {
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: c.appBg, overflow: 'hidden', fontFamily: fonts.sans, color: c.text, WebkitFontSmoothing: 'antialiased' }}>
-      <Header {...{ view, setView, periodLabel, goToday, prevPeriod, nextPeriod }} />
+      <Header {...{ view, setView, periodLabel, goToday, prevPeriod, nextPeriod,onHome  }} />
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
         <Sidebar {...{ y, m, selDay, setSelDay, calOn, toggleCal, periodLabel, prevPeriod, nextPeriod, openCreate }} />
         <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', background: c.surface }}>
@@ -166,11 +166,11 @@ export default function PlanoraCalendar() {
 }
 
 // ---- Header -------------------------------------------------------
-function Header({ view, setView, periodLabel, goToday, prevPeriod, nextPeriod }) {
+function Header({ view, setView, periodLabel, goToday, prevPeriod, nextPeriod, onHome  }) {
   const tabs = [['month', '월'], ['week', '주'], ['day', '일'], ['agenda', '아젠다']];
   return (
     <header style={{ height: 60, flexShrink: 0, background: c.surface, borderBottom: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 20, zIndex: 20 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: 232, flexShrink: 0 }}>
+      <div onClick={onhone} title="초기 화면으로" style={{ display: 'flex', alignItems: 'center', gap: 12, width: 232, flexShrink: 0 }}>
         <span style={{ width: 30, height: 30, borderRadius: 8, background: c.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 15, letterSpacing: '-0.5px' }}>P</span>
         <span style={{ fontSize: 19, fontWeight: 600, letterSpacing: '-0.4px' }}>Plantropic</span>
       </div>
