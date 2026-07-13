@@ -29,6 +29,7 @@ export function createApi(baseUrl, getToken) {
       const q = new URLSearchParams(params).toString();
       return req(`/events${q ? `?${q}` : ""}`);
     },
+    getNextTravel: (lat, lng) => req(`/travel/next?lat=${lat}&lng=${lng}`),
     getSuggestions: (weekStart) => req(`/ai/suggestions${weekStart ? `?weekStart=${weekStart}` : ""}`),
     getTravel: () => req("/ai/travel"),
     createEvent: (e) => req("/events", { method: "POST", body: JSON.stringify(e) }),

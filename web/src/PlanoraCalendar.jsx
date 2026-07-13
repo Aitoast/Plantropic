@@ -170,7 +170,7 @@ function Header({ view, setView, periodLabel, goToday, prevPeriod, nextPeriod, o
   const tabs = [['month', '월'], ['week', '주'], ['day', '일'], ['agenda', '아젠다']];
   return (
     <header style={{ height: 60, flexShrink: 0, background: c.surface, borderBottom: `1px solid ${c.border}`, display: 'flex', alignItems: 'center', padding: '0 20px', gap: 20, zIndex: 20 }}>
-      <div onClick={onhone} title="초기 화면으로" style={{ display: 'flex', alignItems: 'center', gap: 12, width: 232, flexShrink: 0 }}>
+      <div onClick={onHome} title="초기 화면으로" style={{ display: 'flex', alignItems: 'center', gap: 12, width: 232, flexShrink: 0 }}>
         <span style={{ width: 30, height: 30, borderRadius: 8, background: c.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: 15, letterSpacing: '-0.5px' }}>P</span>
         <span style={{ fontSize: 19, fontWeight: 600, letterSpacing: '-0.4px' }}>Plantropic</span>
       </div>
