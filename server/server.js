@@ -9,13 +9,13 @@ import authRoutes from "./auth.routes.js";
 import eventRoutes from "./events.routes.js";
 import aiRoutes from "./ai.routes.js";
 import { db } from "./db.js";
-import travelRoutes from "./travel.routes.js"
+// import travelRoutes from "./travel.routes.js"
 import agentRoutes from "./agent.routes.js";
 
 const app = express();
 app.use(cors({ origin: process.env.WEB_ORIGIN ?? true, credentials: true }));
 app.use(express.json());
-app.use("/api/travel", travelRoutes); 
+// app.use("/api/travel", travelRoutes); 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 

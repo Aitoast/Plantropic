@@ -30,10 +30,14 @@ export function createApi(baseUrl, getToken) {
       return req(`/events${q ? `?${q}` : ""}`);
     },
     getNextTravel: (lat, lng) => req(`/travel/next?lat=${lat}&lng=${lng}`),
-    getSuggestions: (weekStart) => req(`/ai/suggestions${weekStart ? `?weekStart=${weekStart}` : ""}`),
-    getTravel: () => req("/ai/travel"),
+    // AI 에이전트 (LangGraph). run → 확인필요시 needs_confirmation, resume 로 재개.
+    runAgent: (feature, input) =>
+      req("/agent/run", { method: "POST", body: JSON.stringify({ feature, input }) }),
+    resumeAgent: (threadId, decision) =>
+      req("/agent/resume", { method: "POST", body: JSON.stringify({ threadId, decision }) }),
     createEvent: (e) => req("/events", { method: "POST", body: JSON.stringify(e) }),
     updateEvent: (id, patch) => req(`/events/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
     deleteEvent: (id) => req(`/events/${id}`, { method: "DELETE" }),
   };
 }
+

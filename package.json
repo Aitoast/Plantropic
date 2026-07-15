@@ -1,1 +1,1 @@
-{ "private": true, "workspaces": ["core", "mobile", "server", "web"] }
+{"private":true,"workspaces":["core","mobile","server","web"],"dependencies":{"@langchain/openai":"^1.5.5"}}

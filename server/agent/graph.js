@@ -57,9 +57,20 @@ export function buildGraph({ userId, now = new Date(), model, checkpointer }) {
     .compile({ checkpointer });
 }
 
-// 실제 LLM (키 있을 때만). 없으면 null → 라우트에서 스텁/안내로 폴백.
 export async function makeChatModel() {
-  if (!process.env.ANTHROPIC_API_KEY) return null;
-  const { ChatAnthropic } = await import("@langchain/anthropic");
-  return new ChatAnthropic({ model: process.env.ANTHROPIC_MODEL || "claude-opus-4-8", maxTokens: 1024 });
+  const provider = process.env.AI_PROVIDER ||
+    (process.env.ANTHROPIC_API_KEY ? "claude" :
+     process.env.OPENAI_API_KEY   ? "openai" :
+     process.env.GEMINI_API_KEY   ? "gemini" : null);
+  if (!provider) return null;
+  switch (provider.toLowerCase()) {
+    case "openai": { const { ChatOpenAI } = await import("@langchain/openai");
+      return new ChatOpenAI({ model: process.env.OPENAI_MODEL || "gpt-4o", maxTokens: 1024 }); }
+    case "gemini": { const { ChatGoogleGenerativeAI } = await import("@langchain/google-genai");
+      return new ChatGoogleGenerativeAI({ model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+        apiKey: process.env.GEMINI_API_KEY, maxOutputTokens: 1024 }); }
+    case "claude": default: { const { ChatAnthropic } = await import("@langchain/anthropic");
+      return new ChatAnthropic({ model: process.env.ANTHROPIC_MODEL || "claude-opus-4-8", maxTokens: 1024 }); }
+  }
 }
+

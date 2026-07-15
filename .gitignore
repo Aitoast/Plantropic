@@ -6,3 +6,4 @@ dist/
 build/
 .expo/
 .DS_Store
+./claude
