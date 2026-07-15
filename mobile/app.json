@@ -27,7 +27,20 @@
     },
     "plugins": [
       "@react-native-community/datetimepicker",
-      "expo-secure-store"
-    ]
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#16181d"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9e3c1022-436a-4ff2-9c90-40d0e6c1b63f"
+      }
+    },
+    "owner": "toastmachine"
   }
 }

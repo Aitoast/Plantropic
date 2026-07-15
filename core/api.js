@@ -30,11 +30,20 @@ export function createApi(baseUrl, getToken) {
       return req(`/events${q ? `?${q}` : ""}`);
     },
     getNextTravel: (lat, lng) => req(`/travel/next?lat=${lat}&lng=${lng}`),
-    // AI 에이전트 (LangGraph). run → 확인필요시 needs_confirmation, resume 로 재개.
-    runAgent: (feature, input) =>
-      req("/agent/run", { method: "POST", body: JSON.stringify({ feature, input }) }),
+    // 퀵애드 에이전트 (LangGraph). run(text) → needs_confirmation 이면 resume 으로 승인/거절.
+    runAgent: (text) =>
+      req("/agent/run", { method: "POST", body: JSON.stringify({ text }) }),
     resumeAgent: (threadId, decision) =>
       req("/agent/resume", { method: "POST", body: JSON.stringify({ threadId, decision }) }),
+    // 미루기 (기능): 일정 delta분 이동, cascade=true 면 같은 날 이후 일정도 함께
+    shiftEvent: (id, deltaMinutes, cascade = false) =>
+      req(`/events/${id}/shift`, { method: "POST", body: JSON.stringify({ deltaMinutes, cascade }) }),
+    // 알림 설정/위치/인박스
+    getNotifySettings: () => req("/notify/settings"),
+    saveNotifySettings: (cfg) => req("/notify/settings", { method: "PUT", body: JSON.stringify(cfg) }),
+    reportLocation: (lat, lng) => req("/notify/location", { method: "POST", body: JSON.stringify({ lat, lng }) }),
+    sendInbox: (text) => req("/notify/inbox", { method: "POST", body: JSON.stringify({ text }) }),
+    testNotify: () => req("/notify/test", { method: "POST", body: "{}" }),
     createEvent: (e) => req("/events", { method: "POST", body: JSON.stringify(e) }),
     updateEvent: (id, patch) => req(`/events/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
     deleteEvent: (id) => req(`/events/${id}`, { method: "DELETE" }),
