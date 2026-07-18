@@ -1,10 +1,10 @@
 // mobile/src/InboxScreen.jsx — 앱 인박스 (자연어로 일정 등록/미루기 + confirm 답변)
 //   서버의 POST /api/notify/inbox 로 보내고, needs_confirmation 이면 등록/취소 버튼 표시.
 //   같은 흐름을 슬랙에서도 쓸 수 있음(서버가 동일한 handleInbound 로 처리).
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   View, Text, TextInput, Pressable, ScrollView, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator,
+  KeyboardAvoidingView, Platform, ActivityIndicator, Keyboard,
 } from "react-native";
 import { createApi } from "@scheduler/core/api";
 import { auth } from "./auth";
@@ -32,6 +32,14 @@ export default function InboxScreen() {
   const scroller = useRef(null);
   const toEnd = useCallback(() => scroller.current?.scrollToEnd({ animated: true }), []);
   const push = (m) => setMsgs((prev) => [...prev, m]);
+
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  // 키보드가 올라오면 최신 메시지를 위로 끌어올려 입력창이 내용을 가리지 않게 함
+  useEffect(() => {
+    const sub = Keyboard.addListener("keyboardDidShow", () => setTimeout(toEnd, 60));
+    return () => sub.remove();
+  }, [toEnd]);
 
   // 서버 응답 → 봇 말풍선 (필요시 확인 버튼 포함)
   const renderResult = (out) => {
