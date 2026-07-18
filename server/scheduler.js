@@ -6,6 +6,7 @@
 //      출발권장시각(시작 - 이동 - 준비30분)에 맞춰 미리 알림
 import { db } from "./db.js";
 import { listUsersWithSettings, sendToUser } from "./notify.js";
+import { markNotified } from "./gate.js";
 import { geocode, transitMinutes, computeLeaveBy, mapsConfigured } from "./maps.js";
 
 const PREP = Number(process.env.PREP_MINUTES ?? 30);           // 준비시간(분)
@@ -21,6 +22,7 @@ async function tickUser(userId, cfg, now) {
   const remindMin = Number(cfg.remindMin ?? 30);
   const emptySlotMin = Number(cfg.emptySlotMin ?? 0);
   const dayKey = now.toDateString();
+  let alerted = false; // 이번 틱에 알림을 보냈으면 인박스 15분 창 오픈
 
   const upcoming = await db.listEvents(userId, { from: now.toISOString() });
   const next = upcoming.find((e) => new Date(e.starts_at) > now) ?? null;
@@ -33,6 +35,7 @@ async function tickUser(userId, cfg, now) {
       await sendToUser(userId, `🔔 곧 일정: ${e.title}`,
         `${hhmm(start)} 시작${e.location ? ` @ ${e.location}` : ""}.\n` +
         `미루려면 "30분 미뤄줘" 라고 답장하세요. (뒤 일정까지 함께 밀려면 "전체 30분 미뤄줘")`);
+      alerted = true;
     }
   }
 
@@ -45,6 +48,7 @@ async function tickUser(userId, cfg, now) {
       await sendToUser(userId, "🗓 다음 일정이 비어 있어요",
         `앞으로 ${Math.round(emptySlotMin / 60)}시간 동안 일정이 없네요.\n` +
         `"내일 오후 3시 강남역에서 미팅"처럼 답장하면 바로 등록해드려요.`);
+      alerted = true;
     }
   }
 
@@ -65,12 +69,15 @@ async function tickUser(userId, cfg, now) {
               await sendToUser(userId, `🚇 지금 준비하세요: ${next.title}`,
                 `"${next.location}"까지 대중교통 약 ${minutes}분 + 준비 ${PREP}분 = ${total}분.\n` +
                 `${leaveLabel}까지 출발해야 ${hhmm(start)} 일정에 늦지 않아요.`);
+              alerted = true;
             }
           }
         }
       }
     }
   }
+
+  if (alerted) await markNotified(userId); // 인박스 신규등록 15분 창 오픈
 }
 
 // 현재위치가 없으면 직전 일정의 장소를 출발지로 근사

@@ -15,6 +15,7 @@ router.post("/run", h(async (req, res) => {
   if (!text?.trim()) return res.status(400).json({ message: "text(자연어 일정)가 필요합니다." });
   const out = await runQuickAdd(req.userId, text.trim());
   if (out.status === "error") return res.status(400).json({ message: out.message });
+  if (out.status === "blocked") return res.status(429).json({ message: out.message });
   res.json(out);
 }));
 

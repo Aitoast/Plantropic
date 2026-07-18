@@ -4,6 +4,7 @@
 import { randomUUID } from "crypto";
 import { MemorySaver, Command } from "@langchain/langgraph";
 import { buildQuickAddGraph, makeChatModel } from "./graph.js";
+import { checkQuickAdd, MAX_INBOX_LEN } from "../gate.js";
 
 // 체크포인터: DATABASE_URL 있으면 Postgres(재시작에도 대기중 confirm 유지), 없으면 메모리
 async function makeCheckpointer() {
@@ -35,8 +36,17 @@ function formatResult(threadId, out) {
 }
 
 export async function runQuickAdd(userId, text) {
+  // E) 입력 길이 상한 (LLM 도달 전 컷)
+  if (text.length > MAX_INBOX_LEN)
+    return { status: "error", message: `한 번에 ${MAX_INBOX_LEN}자까지 입력할 수 있어요. (현재 ${text.length}자)` };
+
   const model = await makeChatModel();
   if (!model) return { status: "error", message: "AI 키(ANTHROPIC/OPENAI/GEMINI_API_KEY)를 설정하면 동작합니다." };
+
+  // A/B) 알림 15분 창 OR 하루 한도 안에서만 LLM 신규등록 허용 (확인·미루기는 이 경로 안 탐)
+  const gate = await checkQuickAdd(userId);
+  if (!gate.allowed) return { status: "blocked", message: gate.reason };
+
   const threadId = randomUUID();
   const graph = buildQuickAddGraph({ userId, model, checkpointer });
   const out = await graph.invoke({ text }, { configurable: { thread_id: threadId } });

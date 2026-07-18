@@ -14,7 +14,7 @@ import { registerPush, onNotificationResponse } from "./src/push";
 const DARK = "#16181d";
 const TABS = [
   { key: "calendar", label: "달력", icon: "▦" },
-  { key: "inbox",    label: "인박스", icon: "✉" },
+  { key: "inbox",    label: "어시스트", icon: "✉" },
   { key: "settings", label: "설정", icon: "⚙" },
 ];
 const ORDER = TABS.map((t) => t.key);

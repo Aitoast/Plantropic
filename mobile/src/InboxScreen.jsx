@@ -33,8 +33,6 @@ export default function InboxScreen() {
   const toEnd = useCallback(() => scroller.current?.scrollToEnd({ animated: true }), []);
   const push = (m) => setMsgs((prev) => [...prev, m]);
 
-  const [headerHeight, setHeaderHeight] = useState(0);
-
   // 키보드가 올라오면 최신 메시지를 위로 끌어올려 입력창이 내용을 가리지 않게 함
   useEffect(() => {
     const sub = Keyboard.addListener("keyboardDidShow", () => setTimeout(toEnd, 60));
@@ -112,7 +110,7 @@ export default function InboxScreen() {
 
       <View style={s.inputBar}>
         <TextInput style={s.input} value={text} onChangeText={setText} placeholder="일정을 자연어로 적어보세요"
-          placeholderTextColor="#9aa1ac" onSubmitEditing={send} returnKeyType="send" multiline />
+          placeholderTextColor="#9aa1ac" onSubmitEditing={send} returnKeyType="send" multiline maxLength={200} />
         <Pressable style={[s.sendBtn, (!text.trim() || busy) && { opacity: 0.4 }]} onPress={send} disabled={!text.trim() || busy}>
           <Text style={s.sendTxt}>↑</Text>
         </Pressable>
