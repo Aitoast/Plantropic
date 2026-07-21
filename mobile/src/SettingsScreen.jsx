@@ -87,7 +87,11 @@ export default function SettingsScreen({ onLogout }) {
     setPushBusy(true);
     const r = await registerPush();
     setPushBusy(false);
-    if (r.error) { setPushOn(false); return Alert.alert("푸시 설정 실패", r.error); }
+    if (r.error) {
+      setPushOn(false);
+      // Expo Go/시뮬레이터 등 "지원 안 됨"은 실패가 아니라 안내로 표시
+      return Alert.alert(r.skipped ? "푸시 사용 불가" : "푸시 설정 실패", r.error);
+    }
     setPushOn(true);
     Alert.alert("푸시 켜짐", "이 기기로 백그라운드 알림을 받습니다.");
   };

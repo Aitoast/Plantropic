@@ -3,21 +3,6 @@ import { colors as c, fonts, radius as r, shadow, layout } from './tokens-land';
 import { mockEvents, features, platformPoints, steps, logos, footerCols } from './data';
 import './planora-landing.css';
 
-/*
- * PlanoraLanding
- * ------------------------------------------------------------------
- * 반응형 랜딩페이지. 미디어쿼리 없이 clamp() 타이포 + flex-wrap +
- * grid(auto-fit, minmax) 로 데스크톱 → 모바일까지 유동적으로 접힙니다.
- *
- * 사용법:
- *   import PlanoraLanding from './PlanoraLanding';
- *   <PlanoraLanding desktopShot="/shots/app.png" mobileShot="/shots/app-mobile.png" />
- *
- * 스타일은 인라인 스타일 객체 + 토큰(tokens.js) 조합입니다. 프로젝트에
- * 이미 styled-components / Tailwind / CSS Modules 가 있다면 이 구조를
- * 참고해 해당 방식으로 옮기시면 됩니다.
- */
-
 const container = {
   maxWidth: layout.maxWidth,
   margin: '0 auto',
@@ -83,7 +68,7 @@ function Hero({ onStart }) {
           style={{ ...btnPrimary(52, 26, 15.5), boxShadow: shadow.cta }}>무료로 시작하기</a>
           <a href="#platform"S style={{ ...btnOutline(52, 24, 15.5), gap: 8 }}>▶ 데모 보기</a>
         </div>
-        <div style={{ marginTop: 18, fontSize: 13, color: c.textFaint }}>신용카드 불필요 · 30초 만에 시작</div>
+        <div style={{ marginTop: 18, fontSize: 13, color: c.textFaint }}> 인공지능 어시스트 </div>
       </div>
       <div style={{ flex: '1 1 380px', minWidth: 300, display: 'flex', justifyContent: 'center' }}>
         <HeroMock />
@@ -144,7 +129,7 @@ function Features() {
         <Eyebrow>기능</Eyebrow>
         <h2 style={{...heading , color: "#000000"}}>일정 관리에 필요한<br />모든 것을 하나로</h2>
         <p style={{ fontSize: 'clamp(15px, 1.5vw, 17px)', lineHeight: 1.6, color: c.textMuted, margin: '18px 0 0' }}>
-          개인 일정부터 팀 협업, 프로젝트 태스크까지 — 화면 전환 없이 한 워크스페이스에서 관리하세요.
+          개인 일정부터 팀 협업, 프로젝트 태스크까지 — AI agent 가 도와주는 일정을 화면 전환 없이 한 워크스페이스에서 관리하세요.
         </p>
       </div>
       <div style={{ marginTop: 'clamp(36px, 5vw, 56px)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'clamp(16px, 2vw, 24px)' }}>

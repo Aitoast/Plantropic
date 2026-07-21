@@ -54,9 +54,9 @@ export default function LoginScreen({ onAuthed }) {
             <View style={s.logoMark}><Text style={s.logoMarkTxt}>P</Text></View>
             <Text style={s.logoWord}>Plantropic</Text>
           </View>
-          <Text style={s.heading}>{isLogin ? "다시 오신 걸\n환영해요" : "계정 만들기"}</Text>
+          <Text style={s.heading}>{isLogin ? "일정 관리를 시작하신걸\n환영해요" : "계정 만들기"}</Text>
           <Text style={s.subheading}>
-            {isLogin ? "로그인하고 일정을 이어서 관리하세요." : "30초면 시작할 수 있어요. 카드는 필요 없어요."}
+            {isLogin ? "로그인하고 일정을 이어서 관리하세요." : "간단한 회원가입."}
           </Text>
         </View>
 

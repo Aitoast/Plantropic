@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "c5bdfe72-c676-44ed-9234-49deb234f9c8"
+      }
+    },
+    "android": {
+      "package": "com.toastmachine.scheduler"
+    }
+  }
+}

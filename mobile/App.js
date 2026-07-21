@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet, View, Text, Pressable, ActivityIndicator, Platform,
-  ScrollView, Dimensions,
+  ScrollView, Dimensions, Keyboard,
 } from "react-native";
+import { KeyboardProvider } from "./src/keyboard";
 import CalendarScreen from "./src/CalendarScreen";
 import InboxScreen from "./src/InboxScreen";
 import SettingsScreen from "./src/SettingsScreen";
@@ -24,9 +25,16 @@ export default function App() {
   const [checking, setChecking] = useState(true);
   const [tab, setTab] = useState("calendar");
   const [width, setWidth] = useState(Dimensions.get("window").width);
+  const [kbOpen, setKbOpen] = useState(false);   // 키보드 열림 → 탭바 숨김(입력창 높이 계산 정확)
   const pager = useRef(null);
 
-  // 탭 선택 or 알림 탭 → 해당 페이지로 스크롤(스와이프와 동기화)
+  useEffect(() => {
+    const show = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow", () => setKbOpen(true));
+    const hide = Keyboard.addListener(Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide", () => setKbOpen(false));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
+
+  // 탭 선택 , 알림 탭 
   const goTab = useCallback((key) => {
     const i = ORDER.indexOf(key);
     if (i < 0) return;
@@ -34,18 +42,18 @@ export default function App() {
     pager.current?.scrollTo({ x: i * width, animated: true });
   }, [width]);
 
-  // 좌우 스와이프로 페이지 넘길 때 하단 탭 하이라이트 동기화
+  // 좌우 스와이프로
   const onPagerEnd = (e) => {
     const i = Math.round(e.nativeEvent.contentOffset.x / width);
     if (ORDER[i] && ORDER[i] !== tab) setTab(ORDER[i]);
   };
 
-  // 앱 시작 시 저장된 토큰이 유효하면 바로 로그인 상태로 (로그인 유지)
+  // 로그인 유지
   useEffect(() => {
     auth.me().then(setUser).finally(() => setChecking(false));
   }, []);
 
-  // 로그인되면 푸시 토큰 등록(베스트에포트) + 알림 탭 시 인박스로 이동
+  // 알림 탭 시 어시스트로 이동
   useEffect(() => {
     if (!user) return;
     registerPush().catch(() => {});
@@ -61,40 +69,44 @@ export default function App() {
   );
 
   return (
-    <View style={styles.container}
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
-      {/* 좌우 스와이프 가능한 3화면 페이저 */}
-      <ScrollView
-        ref={pager}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={onPagerEnd}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="none"
-        scrollEventThrottle={16}
-        style={{ flex: 1 }}
-      >
-        <View style={{ width }}><CalendarScreen /></View>
-        <View style={{ width }}><InboxScreen /></View>
-        <View style={{ width }}><SettingsScreen onLogout={() => { setUser(null); goTab("calendar"); }} /></View>
-      </ScrollView>
+    <KeyboardProvider>
+      <View style={styles.container}
+        onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+        {/* 좌우 스와이프 가능한 3화면 페이저 */}
+        <ScrollView
+          ref={pager}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={onPagerEnd}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="none"
+          scrollEventThrottle={16}
+          style={{ flex: 1 }}
+        >
+          <View style={{ width }}><CalendarScreen /></View>
+          <View style={{ width }}><InboxScreen /></View>
+          <View style={{ width }}><SettingsScreen onLogout={() => { setUser(null); goTab("calendar"); }} /></View>
+        </ScrollView>
 
-      {/* 하단 탭바 (클릭 이동도 유지) */}
-      <View style={styles.tabbar}>
-        {TABS.map((t) => {
-          const on = tab === t.key;
-          return (
-            <Pressable key={t.key} style={styles.tab} onPress={() => goTab(t.key)}>
-              <Text style={[styles.tabIcon, on && styles.tabIconOn]}>{t.icon}</Text>
-              <Text style={[styles.tabLabel, on && styles.tabLabelOn]}>{t.label}</Text>
-            </Pressable>
-          );
-        })}
+        {/* 하단 탭바 */}
+        {!kbOpen && (
+          <View style={styles.tabbar}>
+            {TABS.map((t) => {
+              const on = tab === t.key;
+              return (
+                <Pressable key={t.key} style={styles.tab} onPress={() => goTab(t.key)}>
+                  <Text style={[styles.tabIcon, on && styles.tabIconOn]}>{t.icon}</Text>
+                  <Text style={[styles.tabLabel, on && styles.tabLabelOn]}>{t.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
+
+        <StatusBar style="auto" />
       </View>
-
-      <StatusBar style="auto" />
-    </View>
+    </KeyboardProvider>
   );
 }
 

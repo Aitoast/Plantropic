@@ -1,7 +1,6 @@
-// server/inbound.js — 채팅/알림 답장 한 줄을 해석해 알맞은 곳으로 라우팅 (채널 공용)
-//   1) confirm 대기 중이면: "네/응/ok/등록" → 승인, "아니오/취소" → 거절
-//   2) "30분 미뤄줘" / "전체 1시간 연기" → shift 기능 (에이전트 아님)
-//   3) 그 외 → 퀵애드 에이전트 (자연어 → 일정 변환 → confirm)
+// server/inbound.js — 채팅/알림 답장 한 줄을 해석해 알맞은 곳으로 라우팅
+// 자연어를 일정으로 변환
+// 일정을 미루거나 취소또한 자연어로 가능
 import { runQuickAdd, resumeQuickAdd, getPendingConfirm } from "./agent/service.js";
 import { shiftEvent, findNextEvent } from "./reschedule.js";
 
@@ -21,7 +20,7 @@ export async function handleInbound(userId, rawText) {
     return { kind: "confirm", ...out };
   }
 
-  // 2) 미루기 (기능) — 대상은 다음 일정
+  // 2) 미루기 — 대상은 다음 일정
   const m = text.match(SHIFT);
   if (m && (m[2] || m[3])) {
     const delta = (Number(m[2] ?? 0) * 60) + Number(m[3] ?? 0);

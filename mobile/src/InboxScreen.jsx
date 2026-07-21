@@ -4,8 +4,9 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   View, Text, TextInput, Pressable, ScrollView, StyleSheet,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Keyboard,
+  Platform, ActivityIndicator, Keyboard,
 } from "react-native";
+import { KeyboardAvoidingView, keyboardControllerAvailable } from "./keyboard";
 import { createApi } from "@scheduler/core/api";
 import { auth } from "./auth";
 import TravelBanner from "./TravelBanner";
@@ -71,8 +72,10 @@ export default function InboxScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={s.root} behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}>
+    // 개발빌드(keyboard-controller): 양쪽 OS 모두 padding 이 정확 (edge-to-edge 대응)
+    // Expo Go 폴백(RN 기본): iOS 만 padding, 안드로이드는 시스템 리사이즈에 맡김
+    <KeyboardAvoidingView style={s.root}
+      behavior={keyboardControllerAvailable ? "padding" : (Platform.OS === "ios" ? "padding" : undefined)}>
       <View style={s.header}><Text style={s.headerTxt}>인박스</Text></View>
 
       <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={s.list}
