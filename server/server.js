@@ -13,6 +13,7 @@ import travelRoutes from "./travel.routes.js";
 import agentRoutes from "./agent.routes.js";
 import notifyRoutes from "./notify.routes.js";
 import hooksRoutes from "./hooks.routes.js";
+import meetingRoutes from "./teams.routes.js";
 import { startScheduler } from "./scheduler.js";
 
 const app = express();
@@ -26,6 +27,7 @@ app.use("/api/travel", travelRoutes);  // GET /api/travel/next (즉석 이동시
 app.use("/api/agent", agentRoutes);    // 퀵애드 에이전트 run/resume
 app.use("/api/notify", notifyRoutes);  // 알림 설정/위치/테스트/인박스
 app.use("/api/hooks", hooksRoutes);    // 슬랙 등 외부 인바운드 웹훅
+app.use("/api/meetings", meetingRoutes); // 팀 일정 조율(초대·공통 빈시간·확정)
 
 app.get("/api/health", (_req, res) => res.json({ ok: true, store: db.mode }));
 

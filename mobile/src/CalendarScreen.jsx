@@ -13,7 +13,9 @@ const api = createApi(
 );
 
 const DARK = "#16181d";
-const TODAY = { y: 2026, m: 6, d: 7 };   
+// 기기의 현재 날짜 기준 (m 은 0-index: getMonth())
+const _now = new Date();
+const TODAY = { y: _now.getFullYear(), m: _now.getMonth(), d: _now.getDate() };
 const MONTHS = [
   "1월", "2월", "3월", "4월", "5월", "6월", 
   "7월", "8월", "9월", "10월", "11월", "12월"
@@ -21,8 +23,8 @@ const MONTHS = [
 
 export default function CalendarScreen() {
   const [view, setView] = useState("month");     // month | week | day
-  const [cursor, setCursor] = useState({ y: 2026, m: 6 });
-  const [selDay, setSelDay] = useState(7);
+  const [cursor, setCursor] = useState({ y: TODAY.y, m: TODAY.m });
+  const [selDay, setSelDay] = useState(TODAY.d);
   const store = useEventStore(api);
   const events = useMemo(
   () => store.events.map(toUiEvent).filter((e) => e.year === cursor.y && e.month === cursor.m),

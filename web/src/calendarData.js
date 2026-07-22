@@ -12,8 +12,9 @@ export const CATS = {
 
 export const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-// 현재 기준일 (데모). 실제 앱에서는 new Date() 사용.
-export const TODAY = { y: 2026, m: 6, d: 7 }; // 2026-07-07 (m 은 0-index)
+// 현재 기준일 = 브라우저의 실제 날짜 (m 은 0-index: getMonth())
+const _now = new Date();
+export const TODAY = { y: _now.getFullYear(), m: _now.getMonth(), d: _now.getDate() };
 
 // 샘플 일정. 실제 앱에서는 API(FastAPI)에서 fetch.
 // day = 해당 월의 날짜, start/end = 소수 시각(9.5 === 09:30)

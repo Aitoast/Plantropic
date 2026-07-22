@@ -44,6 +44,17 @@ export function createApi(baseUrl, getToken) {
     reportLocation: (lat, lng) => req("/notify/location", { method: "POST", body: JSON.stringify({ lat, lng }) }),
     sendInbox: (text) => req("/notify/inbox", { method: "POST", body: JSON.stringify({ text }) }),
     testNotify: () => req("/notify/test", { method: "POST", body: "{}" }),
+    // 팀 조율: 만들기/목록/상세/참여/공통빈시간/확정
+    createMeeting: (m) => req("/meetings", { method: "POST", body: JSON.stringify(m) }),
+    listMeetings: () => req("/meetings"),
+    getMeeting: (token) => req(`/meetings/${token}`),
+    joinMeeting: (token) => req(`/meetings/${token}/join`, { method: "POST", body: "{}" }),
+    getMeetingSlots: (token) => req(`/meetings/${token}/slots`),
+    pickMeetingSlot: (token, startsAt) =>
+      req(`/meetings/${token}/pick`, { method: "POST", body: JSON.stringify({ startsAt }) }),
+    updateMeeting: (token, patch) => req(`/meetings/${token}`, { method: "PATCH", body: JSON.stringify(patch) }),
+    deleteMeeting: (token) => req(`/meetings/${token}`, { method: "DELETE" }),
+    leaveMeeting: (token) => req(`/meetings/${token}/leave`, { method: "POST", body: "{}" }),
     createEvent: (e) => req("/events", { method: "POST", body: JSON.stringify(e) }),
     updateEvent: (id, patch) => req(`/events/${id}`, { method: "PATCH", body: JSON.stringify(patch) }),
     deleteEvent: (id) => req(`/events/${id}`, { method: "DELETE" }),

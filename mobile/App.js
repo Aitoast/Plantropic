@@ -2,11 +2,12 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet, View, Text, Pressable, ActivityIndicator, Platform,
-  ScrollView, Dimensions, Keyboard,
+  ScrollView, Dimensions, Keyboard, Linking,
 } from "react-native";
 import { KeyboardProvider } from "./src/keyboard";
 import CalendarScreen from "./src/CalendarScreen";
 import InboxScreen from "./src/InboxScreen";
+import TeamScreen from "./src/TeamScreen";
 import SettingsScreen from "./src/SettingsScreen";
 import LoginScreen from "./src/LoginScreen";
 import { auth } from "./src/auth";
@@ -16,6 +17,7 @@ const DARK = "#16181d";
 const TABS = [
   { key: "calendar", label: "달력", icon: "▦" },
   { key: "inbox",    label: "어시스트", icon: "✉" },
+  { key: "team",     label: "팀", icon: "⧉" },
   { key: "settings", label: "설정", icon: "⚙" },
 ];
 const ORDER = TABS.map((t) => t.key);
@@ -26,6 +28,7 @@ export default function App() {
   const [tab, setTab] = useState("calendar");
   const [width, setWidth] = useState(Dimensions.get("window").width);
   const [kbOpen, setKbOpen] = useState(false);   // 키보드 열림 → 탭바 숨김(입력창 높이 계산 정확)
+  const [joinToken, setJoinToken] = useState(null); // 초대 딥링크로 들어온 토큰
   const pager = useRef(null);
 
   useEffect(() => {
@@ -60,6 +63,18 @@ export default function App() {
     return onNotificationResponse(() => goTab("inbox"));
   }, [user, goTab]);
 
+  // 초대 딥링크(plantropic://join/<token> 또는 .../join/<token>) → 팀 탭 + 자동 참여
+  useEffect(() => {
+    if (!user) return;
+    const handle = (url) => {
+      const mt = url && url.match(/\/join\/([^/?#]+)/);
+      if (mt) { setJoinToken(mt[1]); goTab("team"); }
+    };
+    Linking.getInitialURL().then(handle);
+    const sub = Linking.addEventListener("url", (e) => handle(e.url));
+    return () => sub.remove();
+  }, [user, goTab]);
+
   if (checking) return <View style={styles.center}><ActivityIndicator /></View>;
   if (!user) return (
     <View style={styles.container}>
@@ -86,6 +101,7 @@ export default function App() {
         >
           <View style={{ width }}><CalendarScreen /></View>
           <View style={{ width }}><InboxScreen /></View>
+          <View style={{ width }}><TeamScreen joinToken={joinToken} /></View>
           <View style={{ width }}><SettingsScreen onLogout={() => { setUser(null); goTab("calendar"); }} /></View>
         </ScrollView>
 
